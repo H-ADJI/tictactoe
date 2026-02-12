@@ -9,11 +9,15 @@ export default class Store {
         [-1, -1, -1],
         [-1, -1, -1],
       ],
+      history: [],
       turn: 1,
     };
   }
+  resetHistory() {
+    this.state.history = [];
+  }
   resetBoardState() {
-    this.state = this.#initialState();
+    this.state = { ...this.#initialState(), history: this.state.history };
   }
   get turn() {
     return this.state.turn;
@@ -23,6 +27,12 @@ export default class Store {
   }
   getCurrentPlayer() {
     return this.state.turn % 2;
+  }
+  getPlayerWins(playerNumber) {
+    return this.state.history.filter((x) => x == playerNumber).length;
+  }
+  saveGameResult(playerNumber) {
+    this.state.history.push(playerNumber);
   }
   nextTurn(squareId) {
     const row = Math.floor((squareId - 1) / 3);

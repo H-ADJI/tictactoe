@@ -12,6 +12,9 @@ export default class View {
     this.$.modalText = this.#qs("[data-id='modal-text']");
     this.$.playAgainBtn = this.#qs("[data-id='modal-btn']");
     this.$.turnIndicator = this.#qs("[data-id='turn']");
+    this.$.p1Wins = this.#qs("[data-id='p1-wins']");
+    this.$.p2Wins = this.#qs("[data-id='p2-wins']");
+    this.$.ties = this.#qs("[data-id='ties']");
 
     this.$$.squares = this.#qsAll("[data-id='square']");
 
@@ -31,24 +34,29 @@ export default class View {
     });
   }
   bindNewRound(handler) {
-    this.newRoundBtn.addEventListener("click", handler);
+    this.$.newRoundBtn.addEventListener("click", handler);
   }
   bindResetGame(handler) {
     this.$.resetBtn.addEventListener("click", handler);
     this.$.playAgainBtn.addEventListener("click", handler);
   }
 
-  handleGameEnd(player) {
+  handleGameEnd(player, updatedHistory) {
     let msg;
     if (player == null) {
       msg = "Tie";
+      this.$.ties.innerText = updatedHistory;
     } else {
       msg = `Player ${player.id} won !`;
+      if (player.id == 1) {
+        this.$.p1Wins.innerText = updatedHistory;
+      } else {
+        this.$.p2Wins.innerText = updatedHistory;
+      }
     }
     this.$.modalText.textContent = msg;
     this.$.modal.classList.toggle("hidden");
   }
-
   closeModal() {
     this.$.modal.classList.add("hidden");
   }
@@ -59,6 +67,11 @@ export default class View {
     chevronIcon.classList.add("fa-chevron-down");
   }
 
+  clearScoreBoard() {
+    this.$.ties.innerText = 0;
+    this.$.p1Wins.innerText = 0;
+    this.$.p2Wins.innerText = 0;
+  }
   clearBoard() {
     this.$$.squares.forEach((square) => {
       square.replaceChildren();

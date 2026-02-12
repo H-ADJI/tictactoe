@@ -15,6 +15,15 @@ function init() {
     view.clearBoard();
     view.setTurnIndicator(players[store.getCurrentPlayer()]);
   });
+
+  view.bindNewRound((event) => {
+    view.closeModal();
+    view.closeMenu();
+    store.resetBoardState();
+    view.clearBoard();
+    view.setTurnIndicator(players[store.getCurrentPlayer()]);
+    view.clearScoreBoard();
+  });
   view.bindPlayerMoveEvent((square) => {
     const currentPlayerNumber = store.getCurrentPlayer();
     const nextPlayerNumber = store.getNextPlayer();
@@ -27,9 +36,13 @@ function init() {
 
     const gameResult = store.checkGameProgress();
     if (gameResult == 1 || gameResult == 0) {
-      view.handleGameEnd(players[gameResult]);
+      store.saveGameResult(gameResult);
+      const historyUpdate = store.getPlayerWins(gameResult);
+      view.handleGameEnd(players[gameResult], historyUpdate);
     } else if (store.turn == 10) {
-      view.handleGameEnd();
+      store.saveGameResult(gameResult);
+      const historyUpdate = store.getPlayerWins(gameResult);
+      view.handleGameEnd(null, historyUpdate);
     }
   });
 }
