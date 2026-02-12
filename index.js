@@ -9,7 +9,8 @@ function init() {
   const store = new Store();
 
   view.bindResetGame((event) => {
-    view.closePopUps();
+    view.closeModal();
+    view.closeMenu();
     store.resetBoardState();
     view.clearBoard();
     view.setTurnIndicator(players[store.getCurrentPlayer()]);

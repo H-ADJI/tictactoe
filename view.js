@@ -49,9 +49,14 @@ export default class View {
     this.$.modal.classList.toggle("hidden");
   }
 
-  closePopUps() {
+  closeModal() {
     this.$.modal.classList.add("hidden");
+  }
+  closeMenu() {
     this.$.menuItems.classList.add("hidden");
+    this.$.menu.classList.remove("border");
+    const chevronIcon = this.$.menu.querySelector("i");
+    chevronIcon.classList.add("fa-chevron-down");
   }
 
   clearBoard() {
