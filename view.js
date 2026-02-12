@@ -48,6 +48,17 @@ export default class View {
     this.$.modalText.textContent = msg;
     this.$.modal.classList.toggle("hidden");
   }
+
+  closePopUps() {
+    this.$.modal.classList.add("hidden");
+    this.$.menuItems.classList.add("hidden");
+  }
+
+  clearBoard() {
+    this.$$.squares.forEach((square) => {
+      square.replaceChildren();
+    });
+  }
   setTurnIndicator(player) {
     const icon = document.createElement("i");
     const label = document.createElement("p");

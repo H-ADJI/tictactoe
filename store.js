@@ -1,34 +1,41 @@
 export default class Store {
-  #state = {
-    board: [
-      [-1, -1, -1],
-      [-1, -1, -1],
-      [-1, -1, -1],
-    ],
-    turn: 1,
-  };
-  constructor() {}
+  constructor() {
+    this.state = this.#initialState();
+  }
+  #initialState() {
+    return {
+      board: [
+        [-1, -1, -1],
+        [-1, -1, -1],
+        [-1, -1, -1],
+      ],
+      turn: 1,
+    };
+  }
+  resetBoardState() {
+    this.state = this.#initialState();
+  }
   get turn() {
-    return this.#state.turn;
+    return this.state.turn;
   }
   getNextPlayer() {
-    return (this.#state.turn + 1) % 2;
+    return (this.state.turn + 1) % 2;
   }
   getCurrentPlayer() {
-    return this.#state.turn % 2;
+    return this.state.turn % 2;
   }
   nextTurn(squareId) {
     const row = Math.floor((squareId - 1) / 3);
     const col = (squareId - 1) % 3;
-    if (this.#state.board[row][col] != -1) {
+    if (this.state.board[row][col] != -1) {
       return false;
     }
-    this.#state.board[row][col] = this.getCurrentPlayer();
-    this.#state.turn++;
+    this.state.board[row][col] = this.getCurrentPlayer();
+    this.state.turn++;
     return true;
   }
   checkGameProgress() {
-    const rows = this.#state.board;
+    const rows = this.state.board;
     let sequence = rows.concat([
       [rows[0][0], rows[1][0], rows[2][0]],
       [rows[0][1], rows[1][1], rows[2][1]],
