@@ -40,22 +40,26 @@ export default class View {
     this.$.resetBtn.addEventListener("click", handler);
     this.$.playAgainBtn.addEventListener("click", handler);
   }
-
-  handleGameEnd(player, updatedHistory) {
-    let msg;
+  handleScoreBoard(player, updatedHistory) {
     if (player == null) {
-      msg = "Tie";
       this.$.ties.innerText = updatedHistory;
     } else {
-      msg = `Player ${player.id} won !`;
       if (player.id == 1) {
         this.$.p1Wins.innerText = updatedHistory;
       } else {
         this.$.p2Wins.innerText = updatedHistory;
       }
     }
+  }
+  showModal(player) {
+    let msg;
+    this.$.modal.classList.remove("hidden");
+    if (player == null) {
+      msg = "Tie";
+    } else {
+      msg = `Player ${player.id} won !`;
+    }
     this.$.modalText.textContent = msg;
-    this.$.modal.classList.toggle("hidden");
   }
   closeModal() {
     this.$.modal.classList.add("hidden");
@@ -66,7 +70,6 @@ export default class View {
     const chevronIcon = this.$.menu.querySelector("i");
     chevronIcon.classList.add("fa-chevron-down");
   }
-
   clearScoreBoard() {
     this.$.ties.innerText = 0;
     this.$.p1Wins.innerText = 0;
@@ -77,7 +80,7 @@ export default class View {
       square.replaceChildren();
     });
   }
-  setTurnIndicator(player) {
+  nextTurnIndicator(player) {
     const icon = document.createElement("i");
     const label = document.createElement("p");
     const iconClass = player.icon;
@@ -87,6 +90,16 @@ export default class View {
     label.innerText = `Player ${player.id}, you're up!`;
     this.$.turnIndicator.replaceChildren(icon, label);
   }
+  handlePlayedTurns(board, players) {
+    this.$$.squares.forEach((square) => {
+      const squareId = +square.id;
+      const row = Math.floor((squareId - 1) / 3);
+      const col = (squareId - 1) % 3;
+      if (board[row][col] != -1) {
+        this.handlePlayerMove(square, players[board[row][col]]);
+      }
+    });
+  }
   handlePlayerMove(squareEl, player) {
     const icon = document.createElement("i");
     const iconClass = player.icon;
@@ -94,7 +107,6 @@ export default class View {
     icon.classList.add("fa-solid", iconClass, colorClass);
     squareEl.replaceChildren(icon);
   }
-
   #qsAll(selector) {
     const elList = document.querySelectorAll(selector);
 

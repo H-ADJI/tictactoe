@@ -1,6 +1,7 @@
 export default class Store {
-  constructor() {
+  constructor(localStorageKey) {
     this.state = this.#initialState();
+    this.stateKey = localStorageKey;
   }
   #initialState() {
     return {
@@ -14,38 +15,52 @@ export default class Store {
     };
   }
   resetHistory() {
-    this.state.history = [];
+    const state = this.getState();
+    state.history = [];
+    this.saveState(state);
   }
   resetBoardState() {
-    this.state = { ...this.#initialState(), history: this.state.history };
+    const state = { ...this.#initialState(), history: this.getState().history };
+    this.saveState(state);
+  }
+  getState() {
+    const state = window.localStorage.getItem(this.stateKey);
+    return state ? JSON.parse(state) : this.#initialState();
+  }
+  saveState(state) {
+    window.localStorage.setItem(this.stateKey, JSON.stringify(state));
   }
   get turn() {
-    return this.state.turn;
+    return this.getState().turn;
   }
   getNextPlayer() {
-    return (this.state.turn + 1) % 2;
+    return (this.getState().turn + 1) % 2;
   }
   getCurrentPlayer() {
-    return this.state.turn % 2;
+    return this.getState().turn % 2;
   }
   getPlayerWins(playerNumber) {
-    return this.state.history.filter((x) => x == playerNumber).length;
+    return this.getState().history.filter((x) => x == playerNumber).length;
   }
   saveGameResult(playerNumber) {
-    this.state.history.push(playerNumber);
+    const state = this.getState();
+    state.history.push(playerNumber);
+    this.saveState(state);
   }
-  nextTurn(squareId) {
+  playTurn(squareId) {
     const row = Math.floor((squareId - 1) / 3);
     const col = (squareId - 1) % 3;
-    if (this.state.board[row][col] != -1) {
+    const state = this.getState();
+    if (state.board[row][col] != -1) {
       return false;
     }
-    this.state.board[row][col] = this.getCurrentPlayer();
-    this.state.turn++;
+    state.board[row][col] = this.getCurrentPlayer();
+    state.turn++;
+    this.saveState(state);
     return true;
   }
   checkGameProgress() {
-    const rows = this.state.board;
+    const rows = this.getState().board;
     let sequence = rows.concat([
       [rows[0][0], rows[1][0], rows[2][0]],
       [rows[0][1], rows[1][1], rows[2][1]],
