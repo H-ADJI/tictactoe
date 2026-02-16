@@ -1,9 +1,7 @@
+import type { GameState } from "./types.ts";
 export default class Store {
-  constructor(localStorageKey) {
-    this.state = this.#initialState();
-    this.stateKey = localStorageKey;
-  }
-  #initialState() {
+  constructor(private readonly localStorageKey: string) {}
+  #initialState(): GameState {
     return {
       board: [
         [-1, -1, -1],
@@ -23,34 +21,34 @@ export default class Store {
     const state = { ...this.#initialState(), history: this.getState().history };
     this.saveState(state);
   }
-  getState() {
-    const state = window.localStorage.getItem(this.stateKey);
-    return state ? JSON.parse(state) : this.#initialState();
+  getState(): GameState {
+    const state = window.localStorage.getItem(this.localStorageKey);
+    return state ? (JSON.parse(state) as GameState) : this.#initialState();
   }
-  saveState(state) {
-    window.localStorage.setItem(this.stateKey, JSON.stringify(state));
+  saveState(state: GameState) {
+    window.localStorage.setItem(this.localStorageKey, JSON.stringify(state));
   }
-  get turn() {
+  get turn(): number {
     return this.getState().turn;
   }
-  getNextPlayer() {
+  getNextPlayer(): number {
     return (this.getState().turn + 1) % 2;
   }
-  getCurrentPlayer() {
+  getCurrentPlayer(): number {
     return this.getState().turn % 2;
   }
-  getPlayerWins(playerNumber) {
+  getPlayerWins(playerNumber: number): number {
     return this.getState().history.filter((x) => x == playerNumber).length;
   }
-  saveGameResult(playerNumber) {
+  saveGameResult(playerNumber: number) {
     const state = this.getState();
     state.history.push(playerNumber);
     this.saveState(state);
   }
-  playTurn(squareId) {
-    const row = Math.floor((squareId - 1) / 3);
-    const col = (squareId - 1) % 3;
+  playTurn(squareId: number) {
     const state = this.getState();
+    const row = Math.floor((squareId - 1) / state.board.length);
+    const col = (squareId - 1) % state.board.length;
     if (state.board[row][col] != -1) {
       return false;
     }
@@ -69,19 +67,15 @@ export default class Store {
       [rows[0][2], rows[1][1], rows[2][0]],
     ]);
 
-    return this.#checkWinPattern(sequence);
-  }
-
-  #checkWinPattern(pattern) {
-    for (const p of pattern) {
-      if (this.#checkSequence(p)) {
-        return p[0];
+    for (const s of sequence) {
+      if (this.#checkSequence(s)) {
+        return s[0];
       }
     }
     return -1;
   }
 
-  #checkSequence(sequence) {
+  #checkSequence(sequence: number[]) {
     if (sequence[0] == -1) {
       return false;
     }
